@@ -8,7 +8,7 @@ def generate_reference(refname, length):
 
     ref = ''.join((random.choice('ACGT') for _ in range(length)))
     with open(refname, "w") as f:
-        f.write(f"header 0, generated reference, length={length}\n")
+        f.write("header 0, generated reference, length=" + str(length) + "\n")
         f.write(ref)
     return ref
 
