@@ -30,7 +30,7 @@ def generate_reads(ref, number, e, s=1/3, d=1/3, i=1/3):
             u = random.random()
             char = random.choice('ACGT')
             if u < s:
-                read[ind] = char
+                read = read[:ind] + char + read[ind+1:]
             elif u < s + d:
                 read = read[:ind] + read[ind+1:]
             else:
