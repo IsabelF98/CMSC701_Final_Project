@@ -8,7 +8,7 @@ def generate_reference(refname, length):
 
     ref = ''.join((random.choice('ACGT') for _ in range(length)))
     with open(refname, "w") as f:
-        f.write("header 0, generated reference, length=" + str(length) + "\n")
+        f.write(">header 0, generated reference, length=" + str(length) + "\n")
         f.write(ref)
     return ref
 
@@ -42,7 +42,7 @@ def generate_reads(ref, number, e, s=1/3, d=1/3, i=1/3):
 
 def save_reads(outfile, reads):
     # Save generated reads to fasta file *outfile*
-    header = "header {}, generated data, length=" + str(len(reads[0]))
+    header = ">header {}, generated data, length=" + str(len(reads[0]))
     with open(outfile, "w") as f:
         for ind, read in enumerate(reads):
             f.write(header.format(ind) + "\n")
