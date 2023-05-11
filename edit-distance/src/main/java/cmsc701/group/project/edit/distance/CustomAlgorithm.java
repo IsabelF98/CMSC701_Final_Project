@@ -21,8 +21,6 @@ public class CustomAlgorithm {
      */
     public static EditDistanceNode computeEditDistance(String a, String b, int gapCost, int mismatchCost,
             int matchScore, int bandwidth) {
-        // TODO: below
-        // this.bandwidth = Math.min(bandwidth, b.length());
         Profiler myProfiler = new Profiler("RankSupportProfiler");
         myProfiler.start("Timing edit distance of " + a + " and " + b);
 
@@ -83,7 +81,6 @@ public class CustomAlgorithm {
                         matchBChar = b.charAt(j);
                     }
                 }
-                // System.out.println(previousNode);
                 // create the new EditDistanceNode with the attributes set above
                 currentNodes[j] = new EditDistanceNode(currentCost, previousNode, matchAChar, matchBChar);
             }
@@ -92,6 +89,7 @@ public class CustomAlgorithm {
         }
         EditDistanceNode finalNode = currentNodes[b.length() - 1];
         myProfiler.stop();
+
         finalNode.setTime(myProfiler.elapsedTime());
         System.out.println("FinalNode: " + finalNode);
         System.out.println();
@@ -100,5 +98,144 @@ public class CustomAlgorithm {
         System.out.println("Score: " + finalNode.getScore());
         System.out.println("Total time in nanoseconds: " + myProfiler.elapsedTime());
         return finalNode;
+    }
+
+    /**
+     * Computes the edit distance between string a and string b with no traceback.
+     * 
+     * @return the {@link EditDistanceNode} containing the edit distance score and
+     *         the optimal alignment traceback.
+     */
+    public static int computeEditDistanceNoTraceback(String a, String b, int gapCost, int mismatchCost, int matchScore,
+            int bandwidth) {
+        Profiler myProfiler = new Profiler("RankSupportProfiler");
+        myProfiler.start("Timing edit distance with no traceback of " + a + " and " + b);
+
+        int[] previousNodes = new int[b.length()];
+        int[] currentNodes = new int[b.length()];
+        // i=j=0 case, we assume we match the first character of a and b
+        previousNodes[0] = a.charAt(0) == b.charAt(0) ? matchScore : mismatchCost;
+        // compute the edit distances for the rest of the i=0 column by adding the gap
+        // score plus the previous score
+        for (int j = 1; j < Math.min(1 + bandwidth, b.length()); j++) {
+            previousNodes[j] = previousNodes[j - 1] + gapCost;
+            currentNodes[j] = MIN_SCORE;
+        }
+        for (int j = Math.min(1 + bandwidth, b.length()); j < b.length(); j++) {
+            previousNodes[j] = MIN_SCORE;
+            currentNodes[j] = MIN_SCORE;
+        }
+
+        // loop through each column (character in string a)
+        for (int i = 1; i < a.length(); i++) {
+            // loop through each character in b
+            for (int j = Math.max(i - bandwidth, 0); j < Math.min(i + bandwidth, b.length()); j++) {
+                int previousNode = 0;
+                int currentCost;
+                // if we are still at the beginning of string b, add the gap cost
+                if (j == 0) {
+                    previousNode = previousNodes[j];
+                    currentCost = previousNode + gapCost;
+                } else {
+                    // calculate the scores using previous node options of (i-1,j-1), (i-1,j), and
+                    // (i,j-1) and take the maximum score
+                    int diagonal = (a.charAt(i) == b.charAt(j) ? matchScore : mismatchCost) + previousNodes[j - 1];
+                    int gapA = gapCost + previousNodes[j];
+                    int gapB = gapCost + currentNodes[j - 1];
+                    currentCost = Math.max(diagonal, Math.max(gapA, gapB));
+                }
+                // create the new EditDistanceNode with the score calculated above
+                currentNodes[j] = currentCost;
+            }
+            // copy all the current nodes into the previous nodes to begin the next loop
+            previousNodes = currentNodes.clone();
+        }
+        int finalNode = currentNodes[b.length() - 1];
+        myProfiler.stop();
+        // finalNode.setTime(myProfiler.elapsedTime());
+        System.out.println();
+        System.out.println("Score (no traceback): " + finalNode);
+        System.out.println("Total time in nanoseconds: " + myProfiler.elapsedTime());
+        return finalNode;
+    }
+
+    /**
+     * Computes the edit distance between string a and string b with no traceback
+     * and returns the runtime.
+     * 
+     * @return the {@link EditDistanceNode} containing the edit distance score and
+     *         the optimal alignment traceback.
+     */
+    public static long computeEditDistanceNoTracebackGetTime(String a, String b, int gapCost, int mismatchCost,
+            int matchScore, int bandwidth) {
+        Profiler myProfiler = new Profiler("RankSupportProfiler");
+        myProfiler.start("Timing edit distance with no traceback of " + a + " and " + b);
+
+        int[] previousNodes = new int[b.length()];
+        int[] currentNodes = new int[b.length()];
+        // i=j=0 case, we assume we match the first character of a and b
+        previousNodes[0] = a.charAt(0) == b.charAt(0) ? matchScore : mismatchCost;
+        // compute the edit distances for the rest of the i=0 column by adding the gap
+        // score plus the previous score
+        for (int j = 1; j < Math.min(1 + bandwidth, b.length()); j++) {
+            previousNodes[j] = previousNodes[j - 1] + gapCost;
+            currentNodes[j] = MIN_SCORE;
+        }
+        for (int j = Math.min(1 + bandwidth, b.length()); j < b.length(); j++) {
+            previousNodes[j] = MIN_SCORE;
+            currentNodes[j] = MIN_SCORE;
+        }
+
+        // loop through each column (character in string a)
+        for (int i = 1; i < a.length(); i++) {
+            // loop through each character in b
+            for (int j = Math.max(i - bandwidth, 0); j < Math.min(i + bandwidth, b.length()); j++) {
+                // System.out.println("i=" + i + " j=" + j);
+                int previousNode = 0;
+                int currentCost;
+                // System.out.print("PreviousNode: ");
+                // if we are still at the beginning of string b, add the gap cost
+                if (j == 0) {
+                    // System.out.print("i=" + (i - 1) + " j=" + j + " ");
+                    previousNode = previousNodes[j];
+                    currentCost = previousNode + gapCost;
+                } else {
+                    // calculate the scores using previous node options of (i-1,j-1), (i-1,j), and
+                    // (i,j-1) and take the maximum score
+                    int diagonal = (a.charAt(i) == b.charAt(j) ? matchScore : mismatchCost) + previousNodes[j - 1];
+                    int gapA = gapCost + previousNodes[j];
+                    int gapB = gapCost + currentNodes[j - 1];
+                    currentCost = Math.max(diagonal, Math.max(gapA, gapB));
+                }
+                // System.out.println(previousNode);
+                // create the new EditDistanceNode with the score calculated above
+                currentNodes[j] = currentCost;
+            }
+            // copy all the current nodes into the previous nodes to begin the next loop
+            previousNodes = currentNodes.clone();
+        }
+        int finalNode = currentNodes[b.length() - 1];
+        myProfiler.stop();
+        // finalNode.setTime(myProfiler.elapsedTime());
+        System.out.println();
+        System.out.println("Score (no traceback): " + finalNode);
+        System.out.println("Total time in nanoseconds: " + myProfiler.elapsedTime());
+        // return finalNode;
+        return myProfiler.elapsedTime();
+    }
+
+    public static long computeMemory(String a, String b) {
+        // return (a.length()*2 + 38
+        return (8 * (int) (((a.length() * 2) + 45) / 8) + 8 * (int) (((b.length() * 2) + 45) / 8) + 32) * b.length() * 2
+                * 8 + 32 * 4 + 32 * 8 + 32 * 8;
+    }
+
+    public static long computeMemoryNoTraceback(String a, String b) {
+        // each int is 32 bits
+        return (8 * (int) (((a.length() * 2) + 45) / 8) + 8 * (int) (((b.length() * 2) + 45) / 8) * 8 // reading in the
+                                                                                                      // strings
+                + 32 * b.length() * 2 // integers in the edit distance matrix
+                + 32 * 4 // int params
+                + 32 * 8 + 32 * 8); // array
     }
 }

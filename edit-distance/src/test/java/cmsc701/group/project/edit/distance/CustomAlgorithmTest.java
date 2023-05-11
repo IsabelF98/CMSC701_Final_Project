@@ -11,9 +11,18 @@ class CustomAlgorithmTest {
         String a = "abcde";
         String b = "abbde";
         EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 5);
+        node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 5);
+        node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 5);
+        node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 5);
         assertEquals("abcde", node.getMatchA().toString());
         assertEquals("abbde", node.getMatchB().toString());
         assertEquals(3, node.getScore());
+
+        int score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -3, -1, 1, 5);
+        score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -3, -1, 1, 5);
+        score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -3, -1, 1, 5);
+        score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -3, -1, 1, 5);
+        assertEquals(node.getScore(), score);
     }
 
     @Test
@@ -48,17 +57,92 @@ class CustomAlgorithmTest {
     void test4() {
         String a = "AACGTCAGTCAGTA";
         String b = "ATACGATACAGTAC";
-        CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 6);
+        EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 6);
+        int score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -3, -1, 1, 6);
+        assertEquals(node.getScore(), score);
     }
 
     @Test
     void testStatic() {
         String a = "AGTCAGTA";
         String b = "ATCAGTAC";
-        EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 14);
+        EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 2);
+        int score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -3, -1, 1, 2);
+        assertEquals(node.getScore(), score);
+    }
 
-        // EditDistanceNode node = naiveAlgorithm.computeEditDistance();
-        // System.out.println("Score = " + node.getScore());
+    @Test
+    void testGapA() {
+        String a = "CCAAGGTTCCAATTGGCCAAGGTTGGAAACTGACTGACTGACTGACTGACTGACTGACTGACTGYYY";
+        String b = "AXXXCCAAGGTTCCAATTGGCCAAGGTTGGAAACTGACTGACTGACTGACTGACTGACTGACTGACTG";
+        EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, -2, -1, 1, 5);
+        int score = CustomAlgorithm.computeEditDistanceNoTraceback(a, b, -2, -1, 1, 5);
+        assertEquals(node.getScore(), score);
+    }
+
+    @Test
+    void testRuntime() {
+        String a = "TTGAGCAAAAGCCCCGTATACTTCAGAACACGAGAAGCGGGTATCAGCATTAGCCTGAAGGGAAAGGATTACGAACCAACTGAGAATCGGCCCAATAGCTGATCGCAGTCTTAACACGAGGTTGGTACATTCACCAAACATGTATGTCAAAAG";
+        String b = "GTTGAGCAAAACCCCGTATTAGTTAGAACACGGCAAGCGGGTTACTGAATTAGCCTGAAGGGAAAGGGATACGACCAATGAAATCGGCCCAATAGCTGAGCGCTATTTAAACACGAGGTTGGTACATCAACAAAATGTATGTAAAGTATTCCA";
+        int gapCost = -1;
+        int mismatchCost = -1;
+        int matchCost = 0;
+        int bandwidth = 1000;
+
+        // throw away first 100 runs
+        EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+        for (int j = 0; j < 100; j++) {
+            node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+        }
+
+        // get average of 100 runs with traceback
+        long sum = 0;
+        for (int j = 0; j < 100; j++) {
+            node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+            sum += node.getTime();
+        }
+        sum = sum / 100;
+        System.out.println("average runtime in nanoseconds with traceback: " + sum);
+
+        // get average of 100 runs with traceback with bandwidth 20%
+        int bandwidthParam = (int) (a.length() * 0.1);
+        long sumBandwidth = 0;
+        for (int j = 0; j < 100; j++) {
+            node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidthParam);
+            sumBandwidth += node.getTime();
+        }
+        sumBandwidth = sumBandwidth / 100;
+
+        long runtime = CustomAlgorithm.computeEditDistanceNoTracebackGetTime(a, b, gapCost, mismatchCost, matchCost,
+                bandwidth);
+        for (int j = 0; j < 50; j++) {
+            runtime = CustomAlgorithm.computeEditDistanceNoTracebackGetTime(a, b, gapCost, mismatchCost, matchCost,
+                    bandwidth);
+        }
+        // get average of 100 runs with no traceback
+        int sum2 = 0;
+        for (int j = 0; j < 100; j++) {
+            runtime = CustomAlgorithm.computeEditDistanceNoTracebackGetTime(a, b, gapCost, mismatchCost, matchCost,
+                    bandwidth);
+            sum2 += runtime;
+        }
+        sum2 = sum2 / 100;
+
+        // get average of 100 runs with no traceback, banded
+        int sumBandwidth2 = 0;
+        for (int j = 0; j < 100; j++) {
+            runtime = CustomAlgorithm.computeEditDistanceNoTracebackGetTime(a, b, gapCost, mismatchCost, matchCost,
+                    bandwidthParam);
+            sumBandwidth2 += runtime;
+        }
+        sumBandwidth2 = sumBandwidth2 / 100;
+
+        System.out.println("runtime with traceback: " + (double) sum / (double) (Math.pow(10, 9)));
+        System.out.println("runtime no traceback: " + (double) sum2 / (double) (Math.pow(10, 9)));
+        System.out.println("runtime with traceback, banded: " + (double) sumBandwidth / (double) (Math.pow(10, 9)));
+        System.out.println("runtime no traceback, banded: " + (double) sumBandwidth2 / (double) (Math.pow(10, 9)));
+        System.out.println("memory usage with traceback: " + CustomAlgorithm.computeMemory(a, b));
+        System.out.println("memory usage no traceback: " + CustomAlgorithm.computeMemoryNoTraceback(a, b));
     }
 
 }

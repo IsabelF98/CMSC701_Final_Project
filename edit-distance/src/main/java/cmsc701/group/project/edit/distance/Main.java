@@ -1,9 +1,11 @@
 package cmsc701.group.project.edit.distance;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A main class to call the {@link CustomAlgorithm} class to compute edit
@@ -34,25 +36,25 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         String a = null;
-        String b = null;
         String outputFile = null;
         int gapCost = -3;
         int mismatchCost = -1;
         int matchCost = 1;
         int bandwidth = 1000;
         int i = 2;
+        List<String> sequences = new ArrayList<>();
 
         if ("file".equals(args[0])) {
-            String filename = args[1];
+            String filename1 = args[1];
+            String filename2 = args[i];
+            i++;
             outputFile = args[i];
             i++;
-            try (Scanner scanner = new Scanner(new File(filename))) {
-                a = scanner.nextLine().trim();
-                b = scanner.nextLine().trim();
-            }
+            a = readFastaFileFirstEntry(filename1);
+            sequences = readFastaFile(filename2);
         } else {
             a = args[0];
-            b = args[1];
+            sequences.add(args[1]);
         }
         if (args.length > i) {
             gapCost = Integer.valueOf(args[i]);
@@ -73,22 +75,83 @@ public class Main {
             }
         }
 
-        EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+        FileWriter fileWriter = null;
         if (outputFile != null) {
-            try {
-                FileWriter fileWriter = new FileWriter(outputFile);
-                fileWriter.write(node.getMatchA().append("\n").append(node.getMatchB()).append("\n")
-                        .append(node.getScore()).append("\n").append(node.getTime()).toString());
-                fileWriter.close();
-                System.out.println("Successfully wrote to the output file.");
-            } catch (IOException e) {
-                System.out.println("An error occurred while writing to the file.");
-                e.printStackTrace();
-            }
-
-        } else {
-            System.out.println(node);
+            fileWriter = new FileWriter(outputFile);
         }
+
+        for (String b : sequences) {
+
+            EditDistanceNode node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost,
+                    bandwidth);
+            node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+            node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+            node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+            long sum = 0;
+            for (int j = 0; j < 100; j++) {
+                node = CustomAlgorithm.computeEditDistance(a, b, gapCost, mismatchCost, matchCost, bandwidth);
+                sum += node.getTime();
+            }
+            sum = sum / 100;
+            System.out.println("average runtime in nanoseconds: " + sum);
+
+            if (outputFile != null) {
+                fileWriter.write(node.getMatchA().append("\n").append(node.getMatchB()).append("\n")
+                        .append(node.getScore()).append("\n").append(node.getTime()).append("\n\n").toString());
+
+            } else {
+                System.out.println(node);
+            }
+        }
+        if (outputFile != null) {
+            fileWriter.close();
+        }
+    }
+
+    /**
+     * Reads in the first entry in FASTA file and returns a string containing the
+     * text.
+     * 
+     * @param filename the file name
+     * @return the text string
+     * @throws IOException if the file cannot be found
+     */
+    protected static String readFastaFileFirstEntry(String filename) throws IOException {
+        StringBuilder inputString = new StringBuilder();
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+        boolean isFirst = true;
+        String line = "";
+        while ((line = bufferedReader.readLine()) != null) {
+            if (line.charAt(0) != '>') {
+                inputString = inputString.append(line);
+            } else if (!isFirst) {
+                break;
+            }
+            isFirst = false;
+        }
+        bufferedReader.close();
+        return inputString.toString();
+    }
+
+    /**
+     * Reads in the first entry in FASTA file and returns a string containing the
+     * text.
+     * 
+     * @param filename the file name
+     * @return the text string
+     * @throws IOException if the file cannot be found
+     */
+    protected static List<String> readFastaFile(String filename) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+        String line = "";
+        List<String> sequences = new ArrayList<String>();
+        while ((line = bufferedReader.readLine()) != null) {
+            if (line.charAt(0) != '>') {
+                sequences.add(line);
+            }
+        }
+        bufferedReader.close();
+        return sequences;
     }
 
 }

@@ -10,14 +10,14 @@ Recommended steps to run the program:
 3. Navigate to `CMSC701_Final_Project/edit-distance/target` folder on your local machine wherever you checked out the code. Verify that the jar has been created in this folder with the name as `edit-distance-1.0-SNAPSHOT-jar-with-dependencies.jar`.
 4. Open a command prompt from the `CMSC701_Final_Project/edit-distance/target` folder and run one of the following commands:
 * To input the strings as part of the command: run `java -jar edit-distance-1.0-SNAPSHOT-jar-with-dependencies.jar ACGAA ATCGAA -3 -1 1 5` to compute the edit distance on strings `ACGAA` and `ATCGAA` with a gap cost of -3, mismatch cost of -1, match score of 1, and bandwidth of 5 of which to search along the diagonal for solutions. The edit distance score and optimal path information will be printed out on the console.
-* To input strings from a file: run `java -jar edit-distance-1.0-SNAPSHOT-jar-with-dependencies.jar /path_to_file/inputFile.txt /path_to_file/outputFile.txt -3 -1 1 5` to compute the edit distance on strings contained in inputFile.txt on the first and second lines of the file with a gap cost of -3, mismatch cost of -1, match score of 1, and bandwidth of 5 of which to search along the diagonal for solutions. The outputFile.txt will contain contents like the following:
+* To input strings from two FASTA files: run `java -jar edit-distance-1.0-SNAPSHOT-jar-with-dependencies.jar /path_to_reference_file/inputFile1.fna /path_to_reads_file/inputFile2.fna /path_to_output_file/outputFile.txt -3 -1 1 5` to compute the edit distance on string A contained in inputFile1.fna compared to all the strings contained in inputfile2.fna with a gap cost of -3, mismatch cost of -1, match score of 1, and bandwidth of 5 of which to search along the diagonal for solutions. The outputFile.txt will contain contents like the following:
 ```
 ACTTTATC-
 A-TTTATCG
 1
 1765900
 ```
-The first line is string A with `-` to indicate insertions.  The second line is string B with `-` to indicate insertions.  The third line is the edit distance score. The fourth line is the total time, in nanoseconds, to compute the edit distance.
+The first line is string A with `-` to indicate insertions.  The second line is string B with `-` to indicate insertions.  The third line is the edit distance score. The fourth line is the total time, in nanoseconds, to compute the edit distance.  If multiple strings are contained in inputFile2, then there will be multiple of these entries in the output file.
 
 Note that the gap cost, mismatch cost, match score, and bandwidth parameters are all optional. If not provided, the defaults are gap cost of -3, mismatch cost of -1, match score of 1, and bandwidth of the whole edit distance matrix.
 
