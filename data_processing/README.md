@@ -79,4 +79,35 @@ Required Parameters (in order):
 - **end**: int. End of range of read lengths. Only reads of length $\leq$ **end** will be selected
 
 
+
 </br>
+</br>
+
+----------
+
+
+
+</br>   
+
+## convert_file.py    
+
+</br>
+
+Code to convert fasta to sequence file for pa-bench.  
+
+</br>
+
+Call from command line:  
+
+    python generate_data.py filename  
+
+
+Required Parameters (in order):  
+
+- **filename**: string. Path to fasta file to restructure  
+
+
+</br>
+
+
+Outputs a file of the same name but with extension .seq instead of .fasta.  
