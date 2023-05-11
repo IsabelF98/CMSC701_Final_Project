@@ -1,28 +1,28 @@
 import argparse
 
 
-def convert(filename):
-    with open(filename, "r") as f:
+def convert(reference, read):
+    with open(reference, "r") as f:
+        ref = f.readlines()[1]
+    with open(read, "r") as f:
         lines = f.readlines()
 
-    loc = filename.find('.')
-    filename = filename[:loc] + ".seq"
+    loc = read.find('.')
+    filename = read[:loc] + ".seq"
 
-    counter = 0
     with open(filename, "w") as f:
         for line in lines:
             if "header" in line:
                 continue
-            if counter % 2 == 0:
-                f.write(">" + line)
-            else:
-                f.write("<" + line)
-            counter += 1
+            f.write(">" + ref + "\n")
+            f.write("<" + line)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Evaluate bloom filter")
-    parser.add_argument("filename", type=str,
-                        help="path to file to convert")
+    parser.add_argument("ref_filename", type=str,
+                        help="path to file of reference sequence")
+    parser.add_argument("reads_filename", type=str,
+                        help="path to file of read sequences")
     args = parser.parse_args()
-    convert(filename=args.filename)
+    convert(args.ref_filename, args.reads_filename)

@@ -15,6 +15,7 @@ def main():
                     reads_fn = f"reads_n{n}_e{int(e*100)}_s{int(s*100)}.fasta"
                     line = f'''python generate_data.py {ref_fn} {reads_fn} {n} 500 -e {e} -s {s} -d {(1-s)/2} -i {(1-s)/2}\n'''
                     f.write(line)
+                    f.write(f"python convert_file.py {ref_fn} {reads_fn}\n")
 
 
 if __name__ == '__main__':

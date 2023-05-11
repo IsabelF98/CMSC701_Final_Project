@@ -99,15 +99,34 @@ Code to convert fasta to sequence file for pa-bench.
 
 Call from command line:  
 
-    python generate_data.py filename  
+    python generate_data.py ref_filename reads_filename  
 
 
 Required Parameters (in order):  
 
-- **filename**: string. Path to fasta file to restructure  
+- **ref_filename**: string. Path to fasta file of reference to use for restructuring reads data  
+
+- **reads_filename**: string. Path to fasta file containing reads to restructure  
 
 
 </br>
 
 
-Outputs a file of the same name but with extension .seq instead of .fasta.  
+Outputs a file of the same name as **reads_filename** but with extension .seq instead of .fasta.  
+
+
+</br>
+</br>
+
+----------
+
+
+
+</br>   
+
+## make_bash_scripty.py    
+
+</br>
+
+Code to make a bash script that, when run, generates the synthetic data with the specified parameters.  
+
