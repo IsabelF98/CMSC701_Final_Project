@@ -14,8 +14,7 @@ import numpy as np
 import pandas as pd
 
 # Working directory
-DIR1 = "/Users/'Isabel 1'/Desktop/CMSC701/CMSC701_Final_Project/"
-DIR2 = "/Users/Isabel 1/Desktop/CMSC701/CMSC701_Final_Project/"
+DIR = " "
 
 # Lengths of reads:
 n_vals = [100, 150, 200, 250]
@@ -44,10 +43,10 @@ for e in e_vals:
                 # Run pa-bench
                 file = "synth_n"+str(n)+"_e"+str(int(e*100))+"_s"+str(int(s*100))
                 run = "cargo run --release -- --rerun-all --no-pin ../evals/"+file+".yaml" # pa-bech call
-                os.system("cd "+DIR1+"benchmarking/pa-bench ; "+run)
+                os.system("cd "+DIR+"benchmarking/pa-bench ; "+run)
                 
                 # Get time
-                data_file = open(DIR2+"benchmarking/evals/"+file+".json")
+                data_file = open(DIR+"benchmarking/evals/"+file+".json")
                 data = json.load(data_file)
                 data_file.close()
                 for j in [0,1,2]:
