@@ -30,6 +30,7 @@ class CustomAlgorithmTest {
         String a = "gggabcde";
         String b = "abbde";
         CustomAlgorithm.computeEditDistance(a, b, -3, -1, 1, 8);
+        CustomAlgorithm.computeEditDistanceWithBitVectors(a, b, -3, -1, 1, 8);
     }
 
     @Test
@@ -102,7 +103,7 @@ class CustomAlgorithmTest {
             sum += node.getTime();
         }
         sum = sum / 100;
-        System.out.println("average runtime in nanoseconds with traceback: " + sum);
+//        System.out.println("average runtime in nanoseconds with traceback: " + sum);
 
         // get average of 100 runs with traceback with bandwidth 20%
         int bandwidthParam = (int) (a.length() * 0.1);
@@ -128,6 +129,25 @@ class CustomAlgorithmTest {
         }
         sum2 = sum2 / 100;
 
+        // get average of 100 runs with bit vector
+        int sumBitVector = 0;
+        for (int j = 0; j < 100; j++) {
+            runtime = CustomAlgorithm
+                    .computeEditDistanceWithBitVectors(a, b, gapCost, mismatchCost, matchCost, bandwidth).getTime();
+            sumBitVector += runtime;
+        }
+        sumBitVector = sumBitVector / 100;
+
+        // get average of 100 runs with bit vector, banded
+        int sumBitVectorBanded = 0;
+        for (int j = 0; j < 100; j++) {
+            runtime = CustomAlgorithm
+                    .computeEditDistanceWithBitVectors(a, b, gapCost, mismatchCost, matchCost, bandwidthParam)
+                    .getTime();
+            sumBitVectorBanded += runtime;
+        }
+        sumBitVectorBanded = sumBitVectorBanded / 100;
+
         // get average of 100 runs with no traceback, banded
         int sumBandwidth2 = 0;
         for (int j = 0; j < 100; j++) {
@@ -141,8 +161,12 @@ class CustomAlgorithmTest {
         System.out.println("runtime no traceback: " + (double) sum2 / (double) (Math.pow(10, 9)));
         System.out.println("runtime with traceback, banded: " + (double) sumBandwidth / (double) (Math.pow(10, 9)));
         System.out.println("runtime no traceback, banded: " + (double) sumBandwidth2 / (double) (Math.pow(10, 9)));
+        System.out.println("runtime with bitVector: " + (double) sumBitVector / (double) (Math.pow(10, 9)));
+        System.out
+                .println("runtime with bitVector, banded: " + (double) sumBitVectorBanded / (double) (Math.pow(10, 9)));
         System.out.println("memory usage with traceback: " + CustomAlgorithm.computeMemory(a, b));
         System.out.println("memory usage no traceback: " + CustomAlgorithm.computeMemoryNoTraceback(a, b));
+        System.out.println("memory usage with bitVector: " + CustomAlgorithm.computeMemoryWithBitVector(a, b));
     }
 
 }

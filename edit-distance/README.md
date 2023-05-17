@@ -30,6 +30,9 @@ All the code is contained in the `cmsc701.group.project.edit.distance` package.
 ### EditDistanceNode
 The [EditDistanceNode](src/main/java/cmsc701/group/project/edit/distance/EditDistanceNode.java) is the basic object used to store an edit distance score and the traceback information about the optimal path to an intermediate node (i,j) in the edit distance matrix. The traceback information is stored in the form of two strings (actually StringBuilder which is optimized for concatenation) of forms like `ACAGT` and `AC-GT` where the dash represents an insertion into one of the strings.
 
+### BitVectorNode
+The [BitVectorNode](src/main/java/cmsc701/group/project/edit/distance/BitVectorNode.java) is the basic object used in the variant of the algorithm which uses bit vectors to store traceback instead of strings. Similarly to the [EditDistanceNode](src/main/java/cmsc701/group/project/edit/distance/EditDistanceNode.java), it stores an edit distance score and the traceback information about the optimal path to an intermediate node (i,j) in the edit distance matrix. The traceback information is stored in the form of two bit vectors which have 1's to represent insertions into the string and 0's elsewhere.
+
 ### CustomAlgorithm
 The [CustomAlgorithm](src/main/java/cmsc701/group/project/edit/distance/CustomAlgorithm.java) class contains the algorithm for computing edit distance between two strings. The static `computeEditDistance` method takes in two strings, a gap cost, mismatch cost, match score, and bandwidth and uses these parameters to compute the edit distance. The algorithm stores two columns of the edit distance matrix at one time: the previous column and the current column. These columns each represent one character of string B that we attempt to match with each character of string A.
 

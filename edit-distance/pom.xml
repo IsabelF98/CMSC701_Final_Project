@@ -9,6 +9,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>amplab</groupId>
+            <artifactId>succinct</artifactId>
+            <version>0.1.7</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.6</version>
@@ -49,6 +54,15 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    
+    
+    <repositories>
+        <repository>
+            <id>spark-repo</id>
+            <name>Spark Repository</name>
+            <url>https://repos.spark-packages.org/</url>
+        </repository>
+    </repositories>
 
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
